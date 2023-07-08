@@ -17,6 +17,10 @@ class Presupuesto {
         this.restante = Number(presupuesto);
         this.gastos = [];
     }
+
+    agregarNuevoGasto(gasto){
+        this.gastos = [...this.gastos, gasto];
+    }
 }
 
 class UI {
@@ -73,7 +77,7 @@ function agregarGasto(e) {
 
     // Leer datos de formulario
     const nombre = document.querySelector('#gasto').value.trim();
-    const cantidad = document.querySelector('#cantidad').value.trim();
+    let cantidad = document.querySelector('#cantidad').value.trim();
 
     // Validar
     if( nombre === '' || cantidad === ''){
@@ -88,4 +92,15 @@ function agregarGasto(e) {
         objUI.mostrarAlerta('El nombre debe ser de formato texto', 'error');
         return;
     }
+
+    // Destructuring inverso, creando un objeto
+    cantidad = Number(cantidad);
+    const gasto = { nombre, cantidad, id: Date.now() }
+
+    //Agregar nuevo gasto
+    objPresupuesto.agregarNuevoGasto(gasto);
+    
+    objUI.mostrarAlerta('Gasto agregado correctamente');
+
+    formulario.reset();
 }
