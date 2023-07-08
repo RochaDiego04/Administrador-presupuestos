@@ -20,6 +20,12 @@ class Presupuesto {
 
     agregarNuevoGasto(gasto){
         this.gastos = [...this.gastos, gasto];
+        this.calcularRestante();
+    }
+
+    calcularRestante() {
+        const gastado = this.gastos.reduce( (total, gasto) => total + gasto.cantidad, 0);
+        this.restante = this.presupuesto - gastado;
     }
 }
 
@@ -29,6 +35,7 @@ class UI {
         document.querySelector('#total').textContent = presupuesto;
         document.querySelector('#restante').textContent = restante;
     }
+
     mostrarAlerta(mensaje, tipo){
         const divMensaje = document.createElement('div');
         divMensaje.classList.add('text-center', 'alert');
@@ -51,6 +58,7 @@ class UI {
             divMensaje.remove();
         }, 3000);
     }
+
     agregarGastoListado(arrayGastos){
         this.limpiarHTML();
 
@@ -64,7 +72,7 @@ class UI {
 
             // Agregar el HTML del gasto
             nuevoGasto.innerHTML = `
-                ${nombre} <span class="badge badge-primary badge-pill"> ${cantidad}</span>
+                ${nombre} <span class="badge badge-primary badge-pill"> $ ${cantidad}</span>
             `;
 
             // Boton para borrar el gasto
@@ -78,10 +86,15 @@ class UI {
             gastoListado.appendChild(nuevoGasto);
         });
     }
+
     limpiarHTML() {
         while(gastoListado.firstChild){
             gastoListado.removeChild(gastoListado.firstChild);
         }
+    }
+
+    actualizarRestante(restante) {
+        document.querySelector('#restante').textContent = restante;
     }
 }
 
@@ -135,8 +148,12 @@ function agregarGasto(e) {
     // Mensaje de éxito
     objUI.mostrarAlerta('Gasto agregado correctamente');
 
-    const { gastos } = objPresupuesto; // Obtener array con los gastos
+    // Imprimir lso gastos
+    const { gastos, restante } = objPresupuesto; // Obtener array con los gastos
     objUI.agregarGastoListado(gastos);
 
+    objUI.actualizarRestante(restante);
+
+    // Limpiar formulario
     formulario.reset();
 }
