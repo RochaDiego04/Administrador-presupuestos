@@ -23,9 +23,14 @@ class Presupuesto {
         this.calcularRestante();
     }
 
-    calcularRestante() {
+    calcularRestante(){
         const gastado = this.gastos.reduce( (total, gasto) => total + gasto.cantidad, 0);
         this.restante = this.presupuesto - gastado;
+    }
+
+    eliminarGasto(id){
+        this.gastos = this.gastos.filter( gasto => gasto.id !== id );
+        this.calcularRestante();
     }
 }
 
@@ -59,7 +64,7 @@ class UI {
         }, 3000);
     }
 
-    agregarGastoListado(arrayGastos){
+    mostrarGastos(arrayGastos){
         this.limpiarHTML();
 
         arrayGastos.forEach(gasto => {
@@ -79,7 +84,9 @@ class UI {
             const btnBorrar = document.createElement('BUTTON');
             btnBorrar.classList.add('btn','btn-danger','borrar-gasto');
             btnBorrar.innerHTML = 'Borrar &times;'
-
+            btnBorrar.onclick = () => {
+                eliminarGasto(id);
+            }
             nuevoGasto.appendChild(btnBorrar);
 
             // Agregar al HTML
@@ -106,12 +113,14 @@ class UI {
         if( restante < (presupuesto * 0.25) ){
             restanteDiv.classList.remove('alert-success', 'alert-warning');
             restanteDiv.classList.add('alert-danger');
-            console.log(restanteDiv);
         }
         else if ( restante < (presupuesto * 0.5) ){
-            restanteDiv.classList.remove('alert-success', 'alert-danger');
+            restanteDiv.classList.remove('alert-success');
             restanteDiv.classList.add('alert-warning');
-            console.log(restanteDiv);
+        }
+        else {
+            restanteDiv.classList.remove('alert-danger', 'alert-warning');
+            restanteDiv.classList.add('alert-success')
         }
 
         // Si el total es 0 o menor
@@ -174,7 +183,7 @@ function agregarGasto(e) {
 
     // Imprimir lso gastos
     const { gastos, restante } = objPresupuesto; // Obtener array con los gastos
-    objUI.agregarGastoListado(gastos);
+    objUI.mostrarGastos(gastos);
 
     objUI.actualizarRestante(restante);
 
@@ -183,4 +192,17 @@ function agregarGasto(e) {
 
     // Limpiar formulario
     formulario.reset();
+}
+
+function eliminarGasto(id){
+    // Eliminar del objeto
+    objPresupuesto.eliminarGasto(id);
+
+    // Eliminar de la interfaz HTML
+    const {gastos, restante} = objPresupuesto;
+    objUI.mostrarGastos(gastos);
+    objUI.actualizarRestante(restante);
+    // Cambiar color según el porcentaje restante para gastar
+    objUI.comprobarPresupuesto(objPresupuesto);
+
 }
